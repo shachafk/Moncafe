@@ -14,6 +14,14 @@ class Employee(object):
         self.coffee_stand = coffee_stand
 
 
+class EmployeeReport(object):
+    def __init__(self, name, salary, location, income):
+        self.name = name
+        self.salary = salary
+        self.location = location
+        self.income = income
+
+
 class Supplier(object):
     def __init__(self, id, name, contact_information):
         self.id = id
@@ -64,6 +72,14 @@ class Employees:
                INSERT INTO Employees (id, name, salary, coffee_stand) VALUES (?, ?, ?, ?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
 
+    def find(self, id):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT * FROM Employees WHERE id = ?
+        """, [id])
+
+        return Employee(*c.fetchone())
+
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
@@ -71,6 +87,26 @@ class Employees:
         """).fetchall()
 
         return (Employee(*row) for row in all)
+
+
+class EmployeeReports:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def findIncome(self, name):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT income FROM EmployeeReports WHERE name = ?
+            """, [name])
+        if c.rowcount > 0:
+            return int(*c.fetchone())
+        else:
+            return 0
+
+    def insert(self, employeeReport):
+        self._conn.execute("""
+               INSERT OR REPLACE INTO EmployeeReports (name, salary, location, income) VALUES (?,?,?,?)
+           """, [employeeReport.name, employeeReport.salary, employeeReport.location, employeeReport.income])
 
 
 class Suppliers:
@@ -114,17 +150,16 @@ class Products:
         """).fetchall()
 
         return (Product(*row) for row in all)
-
     def update(self, product):
         self._conn.execute("""
         UPDATE Products SET quantity = ? WHERE id = ?
         """, [product.quantity, product.id])
 
-    def find(self, product):
+    def find(self, id):
         c = self._conn.cursor()
         all = c.execute("""
         SELECT * FROM Products WHERE id = ?
-        """, [product.id])
+        """, [id])
 
         return Product(*c.fetchone())
 
@@ -137,6 +172,14 @@ class Coffee_stands:
         self._conn.execute("""
             INSERT INTO Coffee_stands (id, location, number_of_employees) VALUES (?, ?, ?)
         """, [coffeestand.id, coffeestand.location, coffeestand.number_of_employees])
+
+    def findLocation(self, id):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT location FROM Coffee_stands WHERE id = ?
+        """, [id])
+
+        return str(*c.fetchone())
 
     def find_all(self):
         c = self._conn.cursor()
@@ -194,7 +237,7 @@ class _Repository(object):
         self.Products = Products(self._conn)
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
-        self.ActivitiesReport = ActivitiesReport(self._conn)
+        self.EmployeeReports = EmployeeReports(self._conn)
 
     def close(self):
         self._conn.commit()
@@ -236,6 +279,16 @@ class _Repository(object):
               date  DATE    NOT NULL,
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
+          );
+             CREATE TABLE EmployeeReports (
+              name  TEXT PRIMARY KEY,
+              salary  REAL NOT NULL,
+              location  TEXT NOT NULL,
+              income  INT    NOT NULL,
+               
+              FOREIGN KEY(name) REFERENCES Employees(name),
+              FOREIGN KEY(salary) REFERENCES Employees(salary),
+              FOREIGN KEY(location) REFERENCES Coffee_stands(location)
           );
           CREATE TABLE ActivitiesReport (
               date    INT REFERENCES  Activities(date),
