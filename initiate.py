@@ -8,5 +8,5 @@ import sqlite3
 
 # will create a connection to a file base database stored in 'mydb.db' file
 # if the file does not exist, it will be created
-conn = sqlite3.connect('moncafe.db')
-conn.text_factory = bytes
+
+

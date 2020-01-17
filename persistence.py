@@ -4,10 +4,6 @@ import sqlite3
 import atexit
 
 
-
-
-
-
 # Data Transfer Objects:
 class Employee(object):
     def __init__(self, id, name, salary, coffee_stand):
@@ -57,7 +53,7 @@ class Employees:
         self._conn.execute("""
                INSERT INTO Employee (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
-
+    #
     # def find(self, student_id):
     #     c = self._conn.cursor()
     #     c.execute("""
@@ -157,25 +153,40 @@ class _Repository(object):
 
     def create_tables(self):
         self._conn.executescript("""
-          CREATE TABLE students (
-              id      INT         PRIMARY KEY,
-              name    TEXT        NOT NULL
+          CREATE TABLE Employees (
+              id    INT PRIMARY KEY,
+              name  TEXT  NOT NULL,
+              salary    REAL    NOT NULL,
+              coffee_stand  INT 
+              FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id),
+
           );
 
-          CREATE TABLE assignments (
-              num                 INT     PRIMARY KEY,
-              expected_output     TEXT    NOT NULL
+          CREATE TABLE Suppliers (
+              id    INT PRIMARY KEY,
+              name  TEXT    NOT NULL,
+              contact_information   TEXT
           );
 
-          CREATE TABLE grades (
-              student_id      INT     NOT NULL,
-              assignment_num  INT     NOT NULL,
-              grade           INT     NOT NULL,
+          CREATE TABLE Products (
+              id    INT   PRIMARY KEY,
+              description   TEXT    NOT NULL,
+              price REAL    NOT NULL,
+              quantity  INT NOT NULL,
+          );
+          
+          CREATE TABLE Coffee_stands (
+              id    INT PRIMARY KEY,
+              location  TEXT    NOT NULL,
+              number_of_employees   INT,
+          );
+          CREATE TABLE Activities (
+              product_id    INT REFERENCES  Product(id),
+              quantity  INT NOT NULL,
+              activator_id  INT NOT NULL,
+              date  DATE    NOT NULL, 
+              FOREIGN KEY(product_id) REFERENCES Products(id),
 
-              FOREIGN KEY(student_id)     REFERENCES students(id),
-              FOREIGN KEY(assignment_num) REFERENCES assignments(num),
-
-              PRIMARY KEY (student_id, assignment_num)
           );
       """)
 
