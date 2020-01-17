@@ -7,3 +7,4 @@ if __name__ == '__main__':
     repo.__init__()
     repo.create_tables()
     repo.Employees.insert(e)
+
