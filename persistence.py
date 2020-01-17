@@ -58,7 +58,7 @@ class Employees:
     @property
     def find_all(self):
         c = self._conn.cursor()
-        c.execute("""
+        all = c.execute("""
             SELECT id, name, salary, coffee_stand FROM Employees
         """).fetchall()
 
@@ -71,12 +71,12 @@ class Suppliers:
 
     def insert(self, supplier):
         self._conn.execute("""
-                INSERT INTO Suppliers (id, name,contact_information) VALUES (?, ?,?)
+                INSERT INTO Suppliers (id, name,contact_information) VALUES (?, ?, ?)
         """, [supplier.id, supplier.name, supplier.contact_information])
 
     def find_all(self):
         c = self._conn.cursor()
-        c.execute("""
+        all = c.execute("""
             SELECT id, description, price, quantity FROM Products
         """).fetchall()
 
