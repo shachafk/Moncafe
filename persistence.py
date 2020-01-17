@@ -88,17 +88,22 @@ class EmployeeReports:
         c = self._conn.cursor()
         all = c.execute("""
             SELECT income FROM EmployeeReports WHERE name = ?
-            """, [name])
-        if c.rowcount > 0:
-            return int(*c.fetchone())
+            """, [str(name)])
+        row = c.fetchone()
+        if row is None:
+            return [0]
         else:
-            return 0
+            return row
 
     def insert(self, employeeReport):
         self._conn.execute("""
-               INSERT OR REPLACE INTO EmployeeReports (name, salary, location, income) VALUES (?,?,?,?)
+               INSERT INTO EmployeeReports (name, salary, location, income) VALUES (?,?,?,?)
            """, [employeeReport.name, employeeReport.salary, employeeReport.location, employeeReport.income])
 
+    def update(self, name, income):
+        self._conn.execute("""
+               UPDATE EmployeeReports SET income = ? WHERE name = ?
+           """, [income, name])
 
 class Suppliers:
     def __init__(self, conn):
