@@ -99,6 +99,27 @@ class Products:
         """).fetchall()
 
         return (Product(*row) for row in all)
+    def update(self, product):
+        self._conn.execute("""
+        UPDATE Products SET quantity = ? WHERE id = ?
+        """, [product.quantity, product.id])
+
+    def find(self, product):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT * FROM Products WHERE id = ?
+        """, [product.id])
+
+        return Product(*c.fetchone())
+
+
+    # def find_all(self):
+    #     c = self._conn.cursor()
+    #     all = c.execute("""
+    #         SELECT student_id, assignment_num, grade FROM grades
+    #     """).fetchall()
+    #
+    #     return [Grade(*row) for row in all]
 
 
 class Coffee_stands:
@@ -110,13 +131,13 @@ class Coffee_stands:
             INSERT INTO Coffee_stands (id, location, number_of_employees) VALUES (?, ?, ?)
         """, [coffeestand.id, coffeestand.location, coffeestand.number_of_employees])
 
-    def find_all(self):
-        c = self._conn.cursor()
-        all = c.execute("""
-            SELECT id, location, number_of_employees FROM Coffee_stands
-        """).fetchall()
-
-        return (Coffee_stand(*row) for row in all)
+    # def find_all(self):
+    #     c = self._conn.cursor()
+    #     all = c.execute("""
+    #         SELECT student_id, assignment_num, grade FROM grades
+    #     """).fetchall()
+    #
+    #     return [Grade(*row) for row in all]
 
 
 class Activities:
@@ -125,6 +146,7 @@ class Activities:
 
     def insert(self, activitie):
         self._conn.execute("""
+            INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?,?)
             INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?)
         """, [activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date])
 
@@ -149,7 +171,7 @@ class _Repository(object):
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
 
-    def _close(self):
+    def close(self):
         self._conn.commit()
         self._conn.close()
 
@@ -197,4 +219,4 @@ class _Repository(object):
 
 # the repository singleton
 repo = _Repository()
-atexit.register(repo._close)
+atexit.register(repo.close)
