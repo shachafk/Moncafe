@@ -55,11 +55,10 @@ class Employees:
                INSERT INTO Employees (id, name, salary, coffee_stand) VALUES (?, ?, ?, ?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
 
-    @property
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, name, salary, coffee_stand FROM Employees
+            SELECT * FROM Employees
         """).fetchall()
 
         return (Employee(*row) for row in all)
@@ -77,7 +76,7 @@ class Suppliers:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, description, price, quantity FROM Products
+            SELECT * FROM Suppliers
         """).fetchall()
 
         return (Supplier(*row) for row in all)
@@ -95,7 +94,7 @@ class Products:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, description, price, quantity FROM Products
+            SELECT * FROM Products
         """).fetchall()
 
         return (Product(*row) for row in all)
@@ -113,15 +112,6 @@ class Products:
         return Product(*c.fetchone())
 
 
-    # def find_all(self):
-    #     c = self._conn.cursor()
-    #     all = c.execute("""
-    #         SELECT student_id, assignment_num, grade FROM grades
-    #     """).fetchall()
-    #
-    #     return [Grade(*row) for row in all]
-
-
 class Coffee_stands:
     def __init__(self, conn):
         self._conn = conn
@@ -131,13 +121,13 @@ class Coffee_stands:
             INSERT INTO Coffee_stands (id, location, number_of_employees) VALUES (?, ?, ?)
         """, [coffeestand.id, coffeestand.location, coffeestand.number_of_employees])
 
-    # def find_all(self):
-    #     c = self._conn.cursor()
-    #     all = c.execute("""
-    #         SELECT student_id, assignment_num, grade FROM grades
-    #     """).fetchall()
-    #
-    #     return [Grade(*row) for row in all]
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT * FROM Coffee_stands
+        """).fetchall()
+
+        return (Coffee_stand(*row) for row in all)
 
 
 class Activities:
@@ -147,7 +137,6 @@ class Activities:
     def insert(self, activitie):
         self._conn.execute("""
             INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?,?)
-            INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?)
         """, [activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date])
 
     def find_all(self):
