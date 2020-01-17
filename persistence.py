@@ -2,6 +2,7 @@
 
 import sqlite3
 import atexit
+import os
 
 
 # Data Transfer Objects:
@@ -51,7 +52,7 @@ class Employees:
 
     def insert(self, employee):
         self._conn.execute("""
-               INSERT INTO Employee (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
+               INSERT INTO Employees (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
     #
     # def find(self, student_id):
@@ -157,9 +158,9 @@ class _Repository(object):
               id    INT PRIMARY KEY,
               name  TEXT  NOT NULL,
               salary    REAL    NOT NULL,
-              coffee_stand  INT 
-              FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id),
-
+              coffee_stand  INT,
+               
+              FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id)
           );
 
           CREATE TABLE Suppliers (
@@ -172,23 +173,23 @@ class _Repository(object):
               id    INT   PRIMARY KEY,
               description   TEXT    NOT NULL,
               price REAL    NOT NULL,
-              quantity  INT NOT NULL,
+              quantity  INT NOT NULL
           );
           
           CREATE TABLE Coffee_stands (
               id    INT PRIMARY KEY,
               location  TEXT    NOT NULL,
-              number_of_employees   INT,
+              number_of_employees   INT
           );
           CREATE TABLE Activities (
               product_id    INT REFERENCES  Product(id),
               quantity  INT NOT NULL,
               activator_id  INT NOT NULL,
-              date  DATE    NOT NULL, 
-              FOREIGN KEY(product_id) REFERENCES Products(id),
-
+              date  DATE    NOT NULL,
+               
+              FOREIGN KEY(product_id) REFERENCES Products(id)
           );
-      """)
+        """)
 
 
 # see code in previous version...
