@@ -7,7 +7,7 @@ def printall():
     print('Activities')
     activites = Activities.find_all(repo.Activities)
     for activitie in activites:
-        activitie = (activitie.id, activitie.quantity, activitie.activator_id, activitie.date)
+        activitie = (activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date)
         print(activitie)
     print('Coffee stands')
     coffee_stands = Coffee_stands.find_all(repo.Coffee_stands)
@@ -32,12 +32,12 @@ def printall():
     print('Employees report')
     ereports = EmployeeReports.find_all(repo.EmployeeReports)
     for ereport in ereports:
-        ereport = (ereport.name, ereport.salary, str(ereport.location), ereport.income)
+        ereport = (str(ereport.name), ereport.salary, str(ereport.location), float(ereport.income))
         print(ereport)
     print('Activities')
     reports = ActivitiesReport.find_all(repo.ActivitiesReport)
     for report in reports:
-        report = (report.date, str(report.description), report.quantity, report.seller, report.supplier)
+        report = (report.date, report.description, report.quantity, report.seller, str(report.supplier))
         print(report)
 
 

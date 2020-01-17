@@ -4,7 +4,7 @@ from persistence import *
 
 def loadToAreport(activitie):
     date = activitie.date
-    description = Products.finddes(activitie.product_id)
+    description = Products.finddes(repo.Products, activitie.product_id)
     if activitie.quantity>0:
         supplier = activitie.activator_id
         seller = None

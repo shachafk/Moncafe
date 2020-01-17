@@ -154,7 +154,7 @@ class Products:
         all = c.execute("""
         SELECT description FROM Products WHERE id = ?
         """, [id])
-        return str(*c.fetchone)
+        return str(c.fetchone)
 
     def find_all(self):
         c = self._conn.cursor()
@@ -228,13 +228,13 @@ class ActivitiesReport:
 
     def insert(self, activitiereport):
         self._conn.execute("""
-            INSERT OR REPLACE INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?)
         """, [activitiereport.date, activitiereport.description, activitiereport.quantity, activitiereport.seller, activitiereport.supplier])
 
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-             SELECT date, description, seller, supplier FROM ActivitiesReport
+             SELECT * FROM ActivitiesReport
          """).fetchall()
 
         return (activitiereport(*row) for row in all)
@@ -252,6 +252,7 @@ class _Repository(object):
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
         self.EmployeeReports = EmployeeReports(self._conn)
+        self.ActivitiesReport = ActivitiesReport(self._conn)
 
     def close(self):
         self._conn.commit()
