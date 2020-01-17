@@ -44,6 +44,15 @@ class Activitie(object):
         self.date = date
 
 
+class activitiereport(object):
+    def __init__(self, date, description, quantity, seller, supplier):
+        self.date = date
+        self.description = description
+        self.quantity = quantity
+        self.seller = seller
+        self.supplier = supplier
+
+
 # Data Access Objects:
 # All of these are meant to be singletons
 class Employees:
@@ -91,6 +100,13 @@ class Products:
             INSERT INTO Products (id, description, price, quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
+    def finddes(self, id):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT description FROM Products WHERE id = ?
+        """, [id])
+        return str(*c.fetchone)
+
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
@@ -98,6 +114,7 @@ class Products:
         """).fetchall()
 
         return (Product(*row) for row in all)
+
     def update(self, product):
         self._conn.execute("""
         UPDATE Products SET quantity = ? WHERE id = ?
@@ -148,6 +165,24 @@ class Activities:
         return (Activitie(*row) for row in all)
 
 
+class ActivitiesReport:
+    def __init__(self, conn_):
+        self._conn = conn_
+
+    def insert(self, activitiereport):
+        self._conn.execute("""
+            INSERT INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?, ?)
+        """, [activitiereport.date, activitiereport.description, activitiereport.quantity, activitiereport.seller, activitiereport.supplier])
+
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+             SELECT date, description, seller, supplier FROM ActivitiesReport
+         """).fetchall()
+
+        return (activitiereport(*row) for row in all)
+
+
 # The Repository
 
 
@@ -159,6 +194,7 @@ class _Repository(object):
         self.Products = Products(self._conn)
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
+        self.ActivitiesReport = ActivitiesReport(self._conn)
 
     def close(self):
         self._conn.commit()
@@ -200,6 +236,18 @@ class _Repository(object):
               date  DATE    NOT NULL,
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
+          );
+          CREATE TABLE ActivitiesReport (
+              date    INT REFERENCES  Activities(date),
+              description   TEXT    NOT NULL,
+              quantity  INT NOT NULL,
+              seller   TEXT REFERENCES  Employees(name),
+              supplier  TEXT REFERENCES  Suppliers(name),
+
+               
+              FOREIGN KEY(date) REFERENCES Activities(date),
+              FOREIGN KEY(seller) REFERENCES Employees(name),
+              FOREIGN KEY(supplier) REFERENCES Suppliers(name)
           );
         """)
 

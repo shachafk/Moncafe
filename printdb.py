@@ -31,6 +31,11 @@ def printall():
         print(product)
     print('Employees report')
     print('Activities')
+    reports = ActivitiesReport.find_all(repo.ActivitiesReport)
+    for report in reports:
+        report = (report.date, str(report.description), report.quantity, report.seller, report.supplier)
+        print(report)
+
 
 
 

@@ -2,10 +2,25 @@ import sys
 from persistence import *
 
 
+def loadToAreport(activitie):
+    date = activitie.date
+    description = Products.finddes(activitie.product_id)
+    if activitie.quantity>0:
+        supplier = activitie.activator_id
+        seller = None
+    else:
+        seller = activitie.activator_id
+        supplier = None
+    r = activitiereport(date, description, activitie.quantity, seller, supplier)
+    return r
+
+
 def insertActivity(line):
     date = str((line[3]))
     a = Activitie(line[0], line[1], line[2], date)
+    b = loadToAreport(a)
     repo.Activities.insert(a)
+    repo.ActivitiesReport.insert(b)
 
 
 def supplyArrival(line):
