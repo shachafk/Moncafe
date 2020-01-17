@@ -8,6 +8,7 @@ def insertActivity(line):
     repo.Activities.insert(a)
 
 
+
 def supplyArrival(line):
     insertActivity(line)
 
@@ -18,11 +19,25 @@ def supplyArrival(line):
     Products.update(repo.Products, p)
 
 
+def loadToReport(emploeeid, product_id, quantity):
+    e = Employees.find(repo.Employees, emploeeid)
+    name = str(e.name)
+    salary = e.salary
+    coffestand = e.coffee_stand
+    location = Coffee_stands.findLocation(repo.Coffee_stands, coffestand)
+    product = Products.find(repo.Products, product_id)
+    income = int(product.price) * int(quantity)
+    i = EmployeeReports.findIncome(repo.EmployeeReports, name)
+    er = EmployeeReport(name, salary, location, income+i)
+    repo.EmployeeReports.insert(er)
+
+
 def sale(line):
     product_id = line[0]
     quantity = line[1]
-    p = Product(product_id, '', 0, 0)
-    q = Products.find(repo.Products, p)
+    emploeeid = line[2]
+    date = line[3]
+    q = Products.find(repo.Products, product_id)
     i = -int(quantity)
     y = int(q.quantity)
     # check if there is enough products for the activity
@@ -30,6 +45,7 @@ def sale(line):
         u = Product(product_id, '', 0, y - i)
         insertActivity(line)
         Products.update(repo.Products, u)
+        loadToReport(emploeeid, product_id, y-i)
 
 
 def handleLine(line):
