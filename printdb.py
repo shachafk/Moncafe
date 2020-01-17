@@ -30,6 +30,10 @@ def printall():
         supplier = (supplier.id, str(supplier.name), supplier.contact_information)
         print(product)
     print('Employees report')
+    ereports = EmployeeReports.find_all(repo.EmployeeReports)
+    for ereport in ereports:
+        ereport = (ereport.name, ereport.salary, str(ereport.location), ereport.income)
+        print(ereport)
     print('Activities')
     reports = ActivitiesReport.find_all(repo.ActivitiesReport)
     for report in reports:

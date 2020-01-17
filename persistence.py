@@ -108,6 +108,14 @@ class EmployeeReports:
                INSERT OR REPLACE INTO EmployeeReports (name, salary, location, income) VALUES (?,?,?,?)
            """, [employeeReport.name, employeeReport.salary, employeeReport.location, employeeReport.income])
 
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT * FROM EmployeeReports
+        """).fetchall()
+
+        return (EmployeeReport(*row) for row in all)
+
 
 class Suppliers:
     def __init__(self, conn):
@@ -150,6 +158,7 @@ class Products:
         """).fetchall()
 
         return (Product(*row) for row in all)
+
     def update(self, product):
         self._conn.execute("""
         UPDATE Products SET quantity = ? WHERE id = ?
@@ -214,7 +223,7 @@ class ActivitiesReport:
 
     def insert(self, activitiereport):
         self._conn.execute("""
-            INSERT INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?, ?)
         """, [activitiereport.date, activitiereport.description, activitiereport.quantity, activitiereport.seller, activitiereport.supplier])
 
     def find_all(self):
@@ -280,7 +289,7 @@ class _Repository(object):
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
           );
-             CREATE TABLE EmployeeReports (
+          CREATE TABLE EmployeeReports (
               name  TEXT PRIMARY KEY,
               salary  REAL NOT NULL,
               location  TEXT NOT NULL,
@@ -296,8 +305,7 @@ class _Repository(object):
               quantity  INT NOT NULL,
               seller   TEXT REFERENCES  Employees(name),
               supplier  TEXT REFERENCES  Suppliers(name),
-
-               
+      
               FOREIGN KEY(date) REFERENCES Activities(date),
               FOREIGN KEY(seller) REFERENCES Employees(name),
               FOREIGN KEY(supplier) REFERENCES Suppliers(name)
