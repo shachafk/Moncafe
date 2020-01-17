@@ -2,6 +2,7 @@
 
 import sqlite3
 import atexit
+import os
 
 
 # Data Transfer Objects:
@@ -51,7 +52,7 @@ class Employees:
 
     def insert(self, employee):
         self._conn.execute("""
-               INSERT INTO Employee (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
+               INSERT INTO Employees (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
     #
     # def find(self, student_id):
@@ -90,6 +91,20 @@ class Products:
             INSERT INTO Products (id, description, price,quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
+    def update(self, product):
+        self._conn.execute("""
+        UPDATE Products SET quantity = ? WHERE id = ?
+        """, [product.quantity, product.id])
+
+    def find(self, product):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT * FROM Products WHERE id = ?
+        """, [product.id])
+
+        return Product(*c.fetchone())
+
+
     # def find_all(self):
     #     c = self._conn.cursor()
     #     all = c.execute("""
@@ -123,7 +138,7 @@ class Activities:
 
     def insert(self, activitie):
         self._conn.execute("""
-            INSERT INTO Activities (product_id, quantity, activator_id,date) VALUES (?, ?, ?)
+            INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?,?)
         """, [activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date])
 
     # def find_all(self):
@@ -147,7 +162,7 @@ class _Repository(object):
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
 
-    def _close(self):
+    def close(self):
         self._conn.commit()
         self._conn.close()
 
@@ -157,9 +172,9 @@ class _Repository(object):
               id    INT PRIMARY KEY,
               name  TEXT  NOT NULL,
               salary    REAL    NOT NULL,
-              coffee_stand  INT 
-              FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id),
-
+              coffee_stand  INT,
+               
+              FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id)
           );
 
           CREATE TABLE Suppliers (
@@ -172,27 +187,27 @@ class _Repository(object):
               id    INT   PRIMARY KEY,
               description   TEXT    NOT NULL,
               price REAL    NOT NULL,
-              quantity  INT NOT NULL,
+              quantity  INT NOT NULL
           );
           
           CREATE TABLE Coffee_stands (
               id    INT PRIMARY KEY,
               location  TEXT    NOT NULL,
-              number_of_employees   INT,
+              number_of_employees   INT
           );
           CREATE TABLE Activities (
               product_id    INT REFERENCES  Product(id),
               quantity  INT NOT NULL,
               activator_id  INT NOT NULL,
-              date  DATE    NOT NULL, 
-              FOREIGN KEY(product_id) REFERENCES Products(id),
-
+              date  DATE    NOT NULL,
+               
+              FOREIGN KEY(product_id) REFERENCES Products(id)
           );
-      """)
+        """)
 
 
 # see code in previous version...
 
 # the repository singleton
 repo = _Repository()
-atexit.register(repo._close)
+atexit.register(repo.close)
