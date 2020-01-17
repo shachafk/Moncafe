@@ -91,6 +91,20 @@ class Products:
             INSERT INTO Products (id, description, price,quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
+    def update(self, product):
+        self._conn.execute("""
+        UPDATE Products SET quantity = ? WHERE id = ?
+        """, [product.quantity, product.id])
+
+    def find(self, product):
+        c = self._conn.cursor()
+        all = c.execute("""
+        SELECT * FROM Products WHERE id = ?
+        """, [product.id])
+
+        return Product(*c.fetchone())
+
+
     # def find_all(self):
     #     c = self._conn.cursor()
     #     all = c.execute("""
@@ -124,7 +138,7 @@ class Activities:
 
     def insert(self, activitie):
         self._conn.execute("""
-            INSERT INTO Activities (product_id, quantity, activator_id,date) VALUES (?, ?, ?)
+            INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?,?)
         """, [activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date])
 
     # def find_all(self):
@@ -148,7 +162,7 @@ class _Repository(object):
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
 
-    def _close(self):
+    def close(self):
         self._conn.commit()
         self._conn.close()
 
@@ -196,4 +210,4 @@ class _Repository(object):
 
 # the repository singleton
 repo = _Repository()
-atexit.register(repo._close)
+atexit.register(repo.close)
