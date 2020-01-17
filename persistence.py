@@ -52,16 +52,17 @@ class Employees:
 
     def insert(self, employee):
         self._conn.execute("""
-               INSERT INTO Employees (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
+               INSERT INTO Employees (id, name, salary, coffee_stand) VALUES (?, ?, ?, ?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
-    #
-    # def find(self, student_id):
-    #     c = self._conn.cursor()
-    #     c.execute("""
-    #         SELECT id, name FROM students WHERE id = ?
-    #     """, [student_id])
-    #
-    #     return Student(*c.fetchone())
+
+    @property
+    def find_all(self):
+        c = self._conn.cursor()
+        c.execute("""
+            SELECT id, name, salary, coffee_stand FROM Employees
+        """).fetchall()
+
+        return (Employee(*row) for row in all)
 
 
 class Suppliers:
@@ -73,13 +74,13 @@ class Suppliers:
                 INSERT INTO Suppliers (id, name,contact_information) VALUES (?, ?,?)
         """, [supplier.id, supplier.name, supplier.contact_information])
 
-    # def find(self, num):
-    #     c = self._conn.cursor()
-    #     c.execute("""
-    #             SELECT num,expected_output FROM assignments WHERE num = ?
-    #         """, [num])
-    #
-    #     return Assignment(*c.fetchone())
+    def find_all(self):
+        c = self._conn.cursor()
+        c.execute("""
+            SELECT id, description, price, quantity FROM Products
+        """).fetchall()
+
+        return (Supplier(*row) for row in all)
 
 
 class Products:
@@ -88,16 +89,16 @@ class Products:
 
     def insert(self, product):
         self._conn.execute("""
-            INSERT INTO Products (id, description, price,quantity) VALUES (?, ?, ?,?)
+            INSERT INTO Products (id, description, price, quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
-    # def find_all(self):
-    #     c = self._conn.cursor()
-    #     all = c.execute("""
-    #         SELECT student_id, assignment_num, grade FROM grades
-    #     """).fetchall()
-    #
-    #     return [Grade(*row) for row in all]
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT id, description, price, quantity FROM Products
+        """).fetchall()
+
+        return (Product(*row) for row in all)
 
 
 class Coffee_stands:
@@ -109,13 +110,13 @@ class Coffee_stands:
             INSERT INTO Coffee_stands (id, location, number_of_employees) VALUES (?, ?, ?)
         """, [coffeestand.id, coffeestand.location, coffeestand.number_of_employees])
 
-    # def find_all(self):
-    #     c = self._conn.cursor()
-    #     all = c.execute("""
-    #         SELECT student_id, assignment_num, grade FROM grades
-    #     """).fetchall()
-    #
-    #     return [Grade(*row) for row in all]
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT id, location, number_of_employees FROM Coffee_stands
+        """).fetchall()
+
+        return (Coffee_stand(*row) for row in all)
 
 
 class Activities:
@@ -124,16 +125,16 @@ class Activities:
 
     def insert(self, activitie):
         self._conn.execute("""
-            INSERT INTO Activities (product_id, quantity, activator_id,date) VALUES (?, ?, ?)
+            INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?)
         """, [activitie.product_id, activitie.quantity, activitie.activator_id, activitie.date])
 
-    # def find_all(self):
-    #     c = self._conn.cursor()
-    #     all = c.execute("""
-    #         SELECT student_id, assignment_num, grade FROM grades
-    #     """).fetchall()
-    #
-    #     return [Grade(*row) for row in all]
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT product_id, quantity, activator_id, date FROM Activities
+        """).fetchall()
+
+        return (Activitie(*row) for row in all)
 
 
 # The Repository
