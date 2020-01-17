@@ -30,6 +30,8 @@ def printall():
         supplier = (supplier.id, str(supplier.name), supplier.contact_information)
         print(product)
     print('Employees report')
+    print('Activities')
+
 
 
 if __name__ == '__main__':
