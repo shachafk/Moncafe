@@ -14,6 +14,14 @@ class Employee(object):
         self.coffee_stand = coffee_stand
 
 
+class EmployeeReport(object):
+    def __init__(self, name, salary, location, income):
+        self.name = name
+        self.salary = salary
+        self.location = location
+        self.income = income
+
+
 class Supplier(object):
     def __init__(self, id, name, contact_information):
         self.id = id
@@ -52,7 +60,7 @@ class Employees:
 
     def insert(self, employee):
         self._conn.execute("""
-               INSERT INTO Employees (id, name,salary,coffee_stand) VALUES (?, ?,?,?)
+               INSERT INTO Employees (id, name,salary,coffee_stand) VALUES (?,?,?,?)
            """, [employee.id, employee.name, employee.salary, employee.coffee_stand])
     #
     # def find(self, student_id):
@@ -62,6 +70,16 @@ class Employees:
     #     """, [student_id])
     #
     #     return Student(*c.fetchone())
+
+
+class EmployeeReport:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def insert(self, employeeReport):
+        self._conn.execute("""
+               INSERT INTO EmployeeReport (name, salary, location, income) VALUES (?, ?,?,?)
+           """, [employeeReport.name, employeeReport.salary, employeeReport.location, employeeReport.income])
 
 
 class Suppliers:
@@ -202,6 +220,16 @@ class _Repository(object):
               date  DATE    NOT NULL,
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
+          );
+             CREATE TABLE EmployeeReport (
+              name  TEXT,
+              salary  REAL NOT NULL,
+              location  TEXT NOT NULL,
+              income  INT    NOT NULL,
+               
+              FOREIGN KEY(name) REFERENCES Employees(name),
+              FOREIGN KEY(salary) REFERENCES Employees(salary),
+              FOREIGN KEY(location) REFERENCES Coffee_stands(location)
           );
         """)
 
