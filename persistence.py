@@ -66,7 +66,7 @@ class Employees:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, name, salary, coffee_stand FROM Employees
+            SELECT * FROM Employees
         """).fetchall()
 
         return (Employee(*row) for row in all)
@@ -94,7 +94,7 @@ class Suppliers:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, description, price, quantity FROM Products
+            SELECT * FROM Suppliers
         """).fetchall()
 
         return (Supplier(*row) for row in all)
@@ -109,6 +109,13 @@ class Products:
             INSERT INTO Products (id, description, price, quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
+    def find_all(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT * FROM Products
+        """).fetchall()
+
+        return (Product(*row) for row in all)
     def update(self, product):
         self._conn.execute("""
         UPDATE Products SET quantity = ? WHERE id = ?
@@ -145,7 +152,7 @@ class Coffee_stands:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT id, location, number_of_employees FROM Coffee_stands
+            SELECT * FROM Coffee_stands
         """).fetchall()
 
         return (Coffee_stand(*row) for row in all)

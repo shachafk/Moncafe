@@ -4,36 +4,37 @@ from persistence import *
 
 
 def printall():
+    print('Activities')
+    activites = Activities.find_all(repo.Activities)
+    for activitie in activites:
+        activitie = (activitie.id, activitie.quantity, activitie.activator_id, activitie.date)
+        print(activitie)
     print('Coffee stands')
     coffee_stands = Coffee_stands.find_all(repo.Coffee_stands)
     for stand in coffee_stands:
-        stand = (stand.id, stand.location, stand.number_of_employees)
+        stand = (stand.id, str(stand.location), stand.number_of_employees)
         print(stand)
     print('Employees')
     employees = Employees.find_all(repo.Employees)
     for employee in employees:
-        employee = (employee.id, employee.name, employee.salary, employee.coffee_stand)
+        employee = (employee.id, str(employee.name), employee.salary, employee.coffee_stand)
         print(employee)
     print('Products')
     products = Products.find_all(repo.Products)
     for product in products:
-        product = (product.id, product.description, product.price, product.quantity)
+        product = (product.id, str(product.description), product.price, product.quantity)
         print(product)
     print('Suppliers')
     suppliers = Suppliers.find_all(repo.Suppliers)
     for supplier in suppliers:
-        supplier = (supplier.id, supplier.name, supplier.contact_information)
+        supplier = (supplier.id, str(supplier.name), supplier.contact_information)
         print(product)
+    print('Employees report')
+    print('Activities')
+
 
 
 if __name__ == '__main__':
-    os.remove('moncafe.db')
-    e = Employee(1, 'amit', 500, 90)
-    s = Coffee_stand(2, 'Buliding90', 3)
-    repo.__init__()
-    repo.create_tables()
-    repo.Employees.insert(e)
-    repo.Coffee_stands.insert(s)
     printall()
 
 
