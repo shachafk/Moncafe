@@ -1,26 +1,11 @@
 import sys
-from persistence import *
-
-
-def loadToAreport(activitie):
-    date = activitie.date
-    description = Products.finddes(repo.Products, activitie.product_id)
-    if activitie.quantity>0:
-        supplier = activitie.activator_id
-        seller = None
-    else:
-        seller = activitie.activator_id
-        supplier = None
-    r = activitiereport(date, description, activitie.quantity, seller, supplier)
-    return r
+from printdb import *
 
 
 def insertActivity(line):
     date = str((line[3]))
     a = Activitie(line[0], line[1], line[2], date)
-    b = loadToAreport(a)
     repo.Activities.insert(a)
-    repo.ActivitiesReport.insert(b)
 
 
 
@@ -37,11 +22,9 @@ def supplyArrival(line):
 def sale(line):
     product_id = line[0]
     quantity = line[1]
-    emploeeid = line[2]
-    date = line[3]
     q = Products.find(repo.Products, product_id)
     i = -int(quantity)
-    y = int(q.quantity)
+    y = q.quantity
     # check if there is enough products for the activity
     if i <= y:
         u = Product(product_id, '', 0, y - i)
@@ -66,4 +49,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+    repo.Activities.deleteAll()
+    repo.Products.resetQuantity()
     main(sys.argv)
+    printall()

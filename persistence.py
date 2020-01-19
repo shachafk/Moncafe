@@ -136,6 +136,11 @@ class Products:
         UPDATE Products SET quantity = ? WHERE id = ?
         """, [product.quantity, product.id])
 
+    def resetQuantity(self):
+        self._conn.execute("""
+        UPDATE Products SET quantity = 0 
+        """)
+
     def find(self, id):
         c = self._conn.cursor()
         all = c.execute("""
@@ -175,6 +180,11 @@ class Activities:
     def __init__(self, conn):
         self._conn = conn
 
+    def deleteAll(self):
+        self._conn.execute("""
+            DELETE FROM Activities
+        """)
+
     def insert(self, activitie):
         self._conn.execute("""
             INSERT INTO Activities (product_id, quantity, activator_id, date) VALUES (?, ?, ?,?)
@@ -189,24 +199,6 @@ class Activities:
         return (Activitie(*row) for row in all)
 
 
-class ActivitiesReport:
-    def __init__(self, conn_):
-        self._conn = conn_
-
-    def insert(self, activitiereport):
-        self._conn.execute("""
-            INSERT INTO ActivitiesReport (date, description, quantity, seller, supplier) VALUES (?, ?, ?, ?, ?)
-        """, [activitiereport.date, activitiereport.description, activitiereport.quantity, activitiereport.seller, activitiereport.supplier])
-
-    def find_all(self):
-        c = self._conn.cursor()
-        all = c.execute("""
-             SELECT * FROM ActivitiesReport
-         """).fetchall()
-
-        return (activitiereport(*row) for row in all)
-
-
 # The Repository
 
 
@@ -218,7 +210,6 @@ class _Repository(object):
         self.Products = Products(self._conn)
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
-        self.ActivitiesReport = ActivitiesReport(self._conn)
 
     def close(self):
         self._conn.commit()
@@ -239,6 +230,21 @@ class _Repository(object):
                 """).fetchall()
 
         return (EmployeeReport (*row) for row in all)
+    def getActivitiesReport(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT a.date , p.description, a.quantity, CASE WHEN e.name IS NULL THEN 'None' ELSE e.name END AS name , CASE WHEN s.name IS NULL THEN 'None' else s.name END AS name
+            FROM Activities as a
+            INNER JOIN Products as p
+            ON a.product_id = p.id
+            LEFT JOIN Employees as e
+            ON a.activator_id = e.id 
+            LEFT JOIN Suppliers  as s
+            ON a.activator_id = s.id
+            ORDER BY a.date ASC
+                """).fetchall()
+
+        return (activitiereport (*row) for row in all)
 
     def create_tables(self):
         self._conn.executescript("""
@@ -277,17 +283,7 @@ class _Repository(object):
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
           );
-          CREATE TABLE ActivitiesReport (
-              date    INT REFERENCES  Activities(date),
-              description   TEXT    NOT NULL,
-              quantity  INT NOT NULL,
-              seller   TEXT REFERENCES  Employees(name),
-              supplier  TEXT REFERENCES  Suppliers(name),
-      
-              FOREIGN KEY(date) REFERENCES Activities(date),
-              FOREIGN KEY(seller) REFERENCES Employees(name),
-              FOREIGN KEY(supplier) REFERENCES Suppliers(name)
-          );
+
         """)
 
 
