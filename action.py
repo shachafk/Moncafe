@@ -8,7 +8,6 @@ def insertActivity(line):
     repo.Activities.insert(a)
 
 
-
 def supplyArrival(line):
     insertActivity(line)
 

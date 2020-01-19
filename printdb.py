@@ -29,20 +29,22 @@ def printall():
     for supplier in suppliers:
         supplier = (supplier.id, str(supplier.name), str(supplier.contact_information))
         print(supplier)
-    print
-    print('Employees report')
+    print('\nEmployees report')
     ereports = repo.getEmploeeReport()
     for ereport in ereports:
+        name = str(ereport.name)
         if isinstance(ereport.income,int):
             income = int(ereport.income)
         else:
             income = float(ereport.income)
-        ereport = (str(ereport.name), ereport.salary, str(ereport.location), income)
-        print(ereport)
+        ereport = (name, ereport.salary, str(ereport.location), income)
+        toPrint =""
+        for i in ereport:
+            toPrint = toPrint + str(i) + " "
+        print (toPrint[0:-1])
     activite = Activities.find_all(repo.Activities)
     if next(activite, None) is not None:
-        print
-        print('Activities')
+        print('\nActivities')
         reports = repo.getActivitiesReport()
         for report in reports:
             report = (report.date, str(report.description), report.quantity, str(report.seller), str(report.supplier))

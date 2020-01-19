@@ -2,7 +2,6 @@
 
 import sqlite3
 import atexit
-import os
 
 
 # Data Transfer Objects:
@@ -116,13 +115,6 @@ class Products:
             INSERT INTO Products (id, description, price, quantity) VALUES (?, ?, ?,?)
         """, [product.id, product.description, product.price, product.quantity])
 
-    def finddes(self, id):
-        c = self._conn.cursor()
-        all = c.execute("""
-        SELECT description FROM Products WHERE id = ?
-        """, [id])
-        return str(c.fetchone)
-
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
@@ -193,7 +185,7 @@ class Activities:
     def find_all(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT product_id, quantity, activator_id, date FROM Activities
+            SELECT product_id, quantity, activator_id, date FROM Activities ORDER BY date ASC
         """).fetchall()
 
         return (Activitie(*row) for row in all)
@@ -214,10 +206,11 @@ class _Repository(object):
     def close(self):
         self._conn.commit()
         self._conn.close()
+
     def getEmploeeReport(self):
         c = self._conn.cursor()
         all = c.execute("""
-            SELECT 	e.name as name, e.salary as salary, c.location as locatione, CASE WHEN sum(-a.quantity* p.price) IS NOT NULL THEN sum(-a.quantity* p.price) ELSE 0 END AS income
+            SELECT 	e.name as name, e.salary as salary, c.location as location, CASE WHEN sum(-a.quantity* p.price) IS NOT NULL THEN sum(-a.quantity* p.price) ELSE 0 END AS income
             FROM Employees as e
             INNER JOIN 	Coffee_stands c
             ON e.coffee_stand = c.id
@@ -230,6 +223,7 @@ class _Repository(object):
                 """).fetchall()
 
         return (EmployeeReport (*row) for row in all)
+
     def getActivitiesReport(self):
         c = self._conn.cursor()
         all = c.execute("""
@@ -249,36 +243,36 @@ class _Repository(object):
     def create_tables(self):
         self._conn.executescript("""
           CREATE TABLE Employees (
-              id    INT PRIMARY KEY,
+              id    INTEGER PRIMARY KEY,
               name  TEXT  NOT NULL,
               salary    REAL    NOT NULL,
-              coffee_stand  INT,
+              coffee_stand  INTEGER,
                
               FOREIGN KEY(coffee_stand) REFERENCES Coffee_stands(id)
           );
 
           CREATE TABLE Suppliers (
-              id    INT PRIMARY KEY,
+              id    INTEGER PRIMARY KEY,
               name  TEXT    NOT NULL,
               contact_information   TEXT
           );
 
           CREATE TABLE Products (
-              id    INT   PRIMARY KEY,
+              id    INTEGER   PRIMARY KEY,
               description   TEXT    NOT NULL,
               price REAL    NOT NULL,
-              quantity  INT NOT NULL
+              quantity  INTEGER NOT NULL
           );
           
           CREATE TABLE Coffee_stands (
-              id    INT PRIMARY KEY,
+              id    INTEGER PRIMARY KEY,
               location  TEXT    NOT NULL,
-              number_of_employees   INT
+              number_of_employees   INTEGER
           );
           CREATE TABLE Activities (
-              product_id    INT REFERENCES  Product(id),
-              quantity  INT NOT NULL,
-              activator_id  INT NOT NULL,
+              product_id    INTEGER REFERENCES  Product(id),
+              quantity  INTEGER NOT NULL,
+              activator_id  INTEGER NOT NULL,
               date  DATE    NOT NULL,
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
