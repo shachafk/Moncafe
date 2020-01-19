@@ -33,28 +33,6 @@ def supplyArrival(line):
     p = Product(product_id, '', 0, quantity)
     Products.update(repo.Products, p)
 
-def loadEmploees():
-    em = repo.Employees.find_all()
-    employees = Employees.find_all(repo.Employees)
-    for employee in employees:
-        name = str(employee.name)
-        salary = employee.salary
-        coffestand = employee.coffee_stand
-        location = Coffee_stands.findLocation(repo.Coffee_stands, coffestand)
-        er = EmployeeReport(name, salary, location, 0)
-        repo.EmployeeReports.insert(er)
-
-
-def loadToReport(emploeeid, product_id, quantity):
-    e = Employees.find(repo.Employees, emploeeid)
-    name = str(e.name)
-    product = Products.find(repo.Products, product_id)
-    income = float(product.price) * float(quantity)
-    i = EmployeeReports.findIncome(repo.EmployeeReports, name)
-    inc = int(i[0])
-    income = income + inc
-    repo.EmployeeReports.update(name, income)
-
 
 def sale(line):
     product_id = line[0]
@@ -69,7 +47,6 @@ def sale(line):
         u = Product(product_id, '', 0, y - i)
         insertActivity(line)
         Products.update(repo.Products, u)
-        loadToReport(emploeeid, product_id, i)
 
 
 def handleLine(line):
@@ -89,5 +66,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    loadEmploees()
     main(sys.argv)

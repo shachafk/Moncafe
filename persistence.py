@@ -89,39 +89,6 @@ class Employees:
         return (Employee(*row) for row in all)
 
 
-class EmployeeReports:
-    def __init__(self, conn):
-        self._conn = conn
-
-    def findIncome(self, name):
-        c = self._conn.cursor()
-        all = c.execute("""
-            SELECT income FROM EmployeeReports WHERE name = ?
-            """, [str(name)])
-        row = c.fetchone()
-        if row is None:
-            return [0]
-        else:
-            return row
-
-    def insert(self, employeeReport):
-        self._conn.execute("""
-               INSERT INTO EmployeeReports (name, salary, location, income) VALUES (?,?,?,?)
-           """, [employeeReport.name, employeeReport.salary, employeeReport.location, employeeReport.income])
-
-    def update(self, name, income):
-        self._conn.execute("""
-               UPDATE EmployeeReports SET income = ? WHERE name = ?
-           """, [income, name])
-    def find_all(self):
-        c = self._conn.cursor()
-        all = c.execute("""
-            SELECT * FROM EmployeeReports
-        """).fetchall()
-
-        return (EmployeeReport(*row) for row in all)
-
-
 class Suppliers:
     def __init__(self, conn):
         self._conn = conn
@@ -251,12 +218,27 @@ class _Repository(object):
         self.Products = Products(self._conn)
         self.Coffee_stands = Coffee_stands(self._conn)
         self.Activities = Activities(self._conn)
-        self.EmployeeReports = EmployeeReports(self._conn)
         self.ActivitiesReport = ActivitiesReport(self._conn)
 
     def close(self):
         self._conn.commit()
         self._conn.close()
+    def getEmploeeReport(self):
+        c = self._conn.cursor()
+        all = c.execute("""
+            SELECT 	e.name as name, e.salary as salary, c.location as locatione, CASE WHEN sum(-a.quantity* p.price) IS NOT NULL THEN sum(-a.quantity* p.price) ELSE 0 END AS income
+            FROM Employees as e
+            INNER JOIN 	Coffee_stands c
+            ON e.coffee_stand = c.id
+            LEFT JOIN 	Activities as a
+            on a.activator_id = e.id
+            LEFT JOIN 	Products as p
+            ON a.product_id = p.id
+            GROUP BY e.name,e.salary,c.location
+            ORDER BY e.name
+                """).fetchall()
+
+        return (EmployeeReport (*row) for row in all)
 
     def create_tables(self):
         self._conn.executescript("""
@@ -294,16 +276,6 @@ class _Repository(object):
               date  DATE    NOT NULL,
                
               FOREIGN KEY(product_id) REFERENCES Products(id)
-          );
-          CREATE TABLE EmployeeReports (
-              name  TEXT PRIMARY KEY,
-              salary  REAL NOT NULL,
-              location  TEXT NOT NULL,
-              income  INT    NOT NULL,
-               
-              FOREIGN KEY(name) REFERENCES Employees(name),
-              FOREIGN KEY(salary) REFERENCES Employees(salary),
-              FOREIGN KEY(location) REFERENCES Coffee_stands(location)
           );
           CREATE TABLE ActivitiesReport (
               date    INT REFERENCES  Activities(date),
